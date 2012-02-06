@@ -140,11 +140,16 @@ function JSONPCall(context, params, func, errfunc, descriptive) {
 		if (func!=null) func(dataall);
 		mmUI.updateCurrentRequestInfo();	
 	}, "error": function(d,msg) {
+		// S1E: This is not the proper way to handle errors
+		return false
+
 		mmUI.startedRequests[reqdate] = null;
 		//alert("Error "+d+", "+msg);//TODO ZACASNO
 		mmUI.updateCurrentRequestInfo();	
 		if (context!='api/logout') {
+			// S1E: Why do we setupUI here?
 			mmUI.setupUI();
+			// S1E: Failure in some cases is be result of setupUI calls (HTTP 500 on aims etc). Let's not log the user out
 			return mmUI.logout();
 		}
 	}
@@ -2822,6 +2827,7 @@ mmUI._getCookie = function(name) {
 	return "";
 }
 
+// S1E: Requires allowing third party cookies to work in Safari
 // persistence session
 mmUI.updateCookie = function() {
 	if (empty(mmUI.access_token)) return mmUI.deleteCookie();
@@ -3539,7 +3545,7 @@ mmUI.setupUI = function () {
 	$('#padcontent').fadeOut('fast');
 	$('#settingscontent').fadeOut('fast');
 	
-	//alert(window.location.hash);
+	// S1E: Extract params parsing
 	mmUI.param = {};
 	var urlall = window.location.hash.split('?');
 	var url = window.location.hash;
@@ -3630,6 +3636,7 @@ mmUI.setupUI = function () {
 				}
 			} catch (exception) {
 				// S1E: Handle exception
+				console.log("mmUI.setupUI: Error getting geolocation")
 			}
 		}
 
